@@ -1,23 +1,30 @@
 import { Layout, List, Menu } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
-import { addCategories, fetchCategories, removeCategories } from '../ducks/data';
+import { addCategories, fetchCategories, removeCategories, fetchProducts, addParentCategory, removeParentCategory } from '../ducks/data';
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const Page = ({ children, categoriesStack, fetchCategories, addCategories, removeCategories }) => {
-    const [parentCategoryStack, setParentStackCategory] = useState([]);
-
-    useEffect(() => {
-        if (!categoriesStack.length) {
-            fetchCategories();
-        }
-    }, []);
+const Page = ({ children, categoriesStack, parentCategoryStack, fetchCategories, addCategories, removeCategories, fetchProducts }) => {
+    const [needProducts, setNeedProduct] = useState(false);
+    const dispatch = useDispatch();
 
     const currentCategories = categoriesStack[categoriesStack.length - 1];
     const currentParentCategory = parentCategoryStack[parentCategoryStack.length - 1];
 
+    useEffect(() => {
+        if (!categoriesStack.length) {
+            fetchCategories();
+            
+        }
+        if(needProducts) {
+            fetchProducts(currentParentCategory ? currentParentCategory.id : null)
+            setNeedProduct(false)
+        }
+    });
+
+  
     return (
         <Layout>
             <Header>
@@ -46,7 +53,12 @@ const Page = ({ children, categoriesStack, fetchCategories, addCategories, remov
                                         background: 'white'
                                     }}
                                     onClick={() => {
-                                        setParentStackCategory(parentCategoryStack.slice(0, -1))
+                            
+                                        removeParentCategory()(dispatch).then(() => {
+                                            setNeedProduct(true)
+                                        }
+
+                                        )
                                         removeCategories()
                                     }}>
                                     {currentParentCategory.name}
@@ -57,9 +69,13 @@ const Page = ({ children, categoriesStack, fetchCategories, addCategories, remov
                             dataSource={currentCategories}
                             renderItem={item => (
                                 <List.Item onClick={() => {
-                                    const a = [...parentCategoryStack, item]
-                                    setParentStackCategory(a)
+
+                                    addParentCategory(item)(dispatch).then(() =>{
+                                        fetchProducts(categoriesStack.length > 0 ? item.id : null)
+                                    })
                                     addCategories(item.childrens)
+
+
                                 }}
                                     style={{
                                         background: 'white'
@@ -82,13 +98,17 @@ const Page = ({ children, categoriesStack, fetchCategories, addCategories, remov
 }
 
 const mapStateToProps = state => ({
-    categoriesStack: state.data.categoriesStack
+    categoriesStack: state.data.categoriesStack,
+    parentCategoryStack: state.data.parentCategoryStack
 });
 
 const mapDispatchToProps = {
     fetchCategories,
     addCategories,
-    removeCategories
+    removeCategories,
+    fetchProducts,
+    addParentCategory,
+    removeParentCategory
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Page);
