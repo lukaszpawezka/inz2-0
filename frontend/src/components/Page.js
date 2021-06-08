@@ -36,9 +36,9 @@ const Page = ({ children, currentPath, user, logout }) => {
                             </Menu>
                         }>
                             {user.authenticated ?
-                                <a>
+                                
                                     <Avatar name={user.details.fullName} size='40' round={true} />
-                                </a>
+                                
                                 : <></>
                             }
                         </Dropdown>

@@ -15,7 +15,7 @@ export const withAuth = Component => {
 			if (!authenticated) {
 				fetchUserDetails()(dispatch);
 			}
-		}, [authenticated]);
+		}, [authenticated, dispatch]);
 
 		return (
 			authenticated ?
