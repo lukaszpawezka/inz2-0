@@ -1,24 +1,26 @@
+import { ConnectedRouter } from 'connected-react-router';
 import React from 'react';
-import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import About from './pages/About';
-import Rental from './pages/Rental';
 import Home from './pages/Home';
+import Rental from './pages/Rental';
+import { history } from './store';
 
 const App = () => {
   return (
-    <Router>
+    <ConnectedRouter history={history}>
       <Switch>
-        <Route path="/about">
+        <Route key='about' exact path="/about">
           <About />
         </Route>
-        <Route path="/rental">
+        <Route key='rental' exact path="/rental">
           <Rental />
         </Route>
-        <Route path="/">
+        <Route key='home' exact path="/">
           <Home />
         </Route>
       </Switch>
-    </Router>
+    </ConnectedRouter>
   );
 }
 

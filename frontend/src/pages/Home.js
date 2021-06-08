@@ -1,4 +1,3 @@
-import Layout from 'antd/lib/layout/layout'
 import React from 'react'
 import Page from '../components/Page'
 

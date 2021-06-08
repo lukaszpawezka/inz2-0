@@ -71,7 +71,7 @@ export const processResponse = response =>
 			} else {
 				dispatch(actionLogout());
 				clear();
-				throw 'Login required!';
+				throw new Error('Login required!');
 			}
 		} else {
 			return response.json()
@@ -86,7 +86,10 @@ export const processError = error =>
 
 export const fetchUserDetails = () =>
 	dispatch => {
-		return fetch(`${config.API_URL}/me`)
+		return fetch(`${config.API_URL}/me`, {
+			credentials: 'include'
+			//withCredentials: true
+		})
 			.then(response => processResponse(response)(dispatch))
 			.then(userDetails => {
 				if (userDetails) {
@@ -103,12 +106,16 @@ export const login = (username, password) =>
 		const formData = new FormData();
 		formData.append('username', username);
 		formData.append('password', password);
-		return fetch('login', {
+		return fetch(`${config.API_URL}/login`, {
 			method: 'POST',
-			body: config.AUTOLOGIN ? null : formData
+			body: formData,
+			credentials: 'include'
+			//withCredentials: true
 		})
 			.then(response => {
 				if (response.ok) {
+					console.log(document.cookie)
+					console.log(response.headers.get('Set-Cookie'))
 					fetchUserDetails()(dispatch);
 				} else {
 					message.error('Podano nieprawidłowy login lub hasło.');
@@ -120,7 +127,7 @@ export const login = (username, password) =>
 
 export const logout = () =>
 	dispatch => {
-		return fetch('logout', {
+		return fetch(`${config.API_URL}/custom-logout`, {
 			method: 'POST'
 		})
 			.then(() => {

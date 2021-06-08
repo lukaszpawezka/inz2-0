@@ -1,41 +1,48 @@
-import { Layout, List, Menu } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { Dropdown, Layout, Menu } from 'antd';
+import React, { useState } from 'react';
+import Avatar from 'react-avatar';
+import { AiOutlineLogout } from 'react-icons/ai';
+import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
-import { addCategories, fetchCategories, removeCategories, fetchProducts, addParentCategory, removeParentCategory } from '../ducks/data';
+import { logout } from '../ducks/auth';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 
-const Page = ({ children, categoriesStack, parentCategoryStack, fetchCategories, addCategories, removeCategories, fetchProducts }) => {
-    const [needProducts, setNeedProduct] = useState(false);
-    const dispatch = useDispatch();
-
-    const currentCategories = categoriesStack[categoriesStack.length - 1];
-    const currentParentCategory = parentCategoryStack[parentCategoryStack.length - 1];
-
-    useEffect(() => {
-        if (!categoriesStack.length) {
-            fetchCategories();
-            
-        }
-        if(needProducts) {
-            fetchProducts(currentParentCategory ? currentParentCategory.id : null)
-            setNeedProduct(false)
-        }
-    });
-
-  
+const Page = ({ children, currentPath, user, logout }) => {
+    const getSelectedKey = () => {
+        let selectedKey = currentPath.substring(1);
+        selectedKey = selectedKey === '' ? 'home' : selectedKey;
+        return selectedKey;
+    }
+    const [selectedKey, setSelectedKey] = useState(getSelectedKey());
     return (
         <Layout>
             <Header>
                 <Menu style={{
-                    maxWidth: 1000,
+                    maxWidth: 900,
                     margin: '0 auto'
                 }}
-                    theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-                    <Menu.Item key="1"><Link to="/">Home</Link></Menu.Item>
-                    <Menu.Item key="2"><Link to="/rental">Rental</Link></Menu.Item>
-                    <Menu.Item key="3"><Link to="/about">About</Link></Menu.Item>
+                    theme="dark" mode="horizontal" defaultSelectedKeys={[selectedKey]}
+                    onClick={e => setSelectedKey(e.key)} selectedKeys={[selectedKey]}>
+                    <Menu.Item key="home"><Link to="/">Home</Link></Menu.Item>
+                    <Menu.Item key="rental"><Link to="/rental">Rental</Link></Menu.Item>
+                    <Menu.Item key="about"><Link to="/about">About</Link></Menu.Item>
+                    <Menu.Item key='settings' style={{ float: 'right', backgroundColor: 'transparent' }}>
+                        <Dropdown overlay={
+                            <Menu>
+                                <Menu.Item>
+                                    <Link style={{}} to='' onClick={logout}><AiOutlineLogout style={{ verticalAlign: '-0.125em' }} /> Wyloguj</Link>
+                                </Menu.Item>
+                            </Menu>
+                        }>
+                            {user.authenticated ?
+                                <a>
+                                    <Avatar name={user.details.fullName} size='40' round={true} />
+                                </a>
+                                : <></>
+                            }
+                        </Dropdown>
+                    </Menu.Item>
                 </Menu>
             </Header>
             <Content style={{
@@ -45,48 +52,6 @@ const Page = ({ children, categoriesStack, parentCategoryStack, fetchCategories,
                 margin: '0 auto'
             }}>
                 <Layout style={{ padding: '24px 0' }}>
-                    <Sider width={200}>
-                        <List
-                            header={categoriesStack.length > 1 ?
-                                <div
-                                    style={{
-                                        background: 'white'
-                                    }}
-                                    onClick={() => {
-                            
-                                        removeParentCategory()(dispatch).then(() => {
-                                            setNeedProduct(true)
-                                        }
-
-                                        )
-                                        removeCategories()
-                                    }}>
-                                    {currentParentCategory.name}
-                                </div>
-                                : null}
-                            bordered
-                            itemLayout="horizontal"
-                            dataSource={currentCategories}
-                            renderItem={item => (
-                                <List.Item onClick={() => {
-
-                                    addParentCategory(item)(dispatch).then(() =>{
-                                        fetchProducts(categoriesStack.length > 0 ? item.id : null)
-                                    })
-                                    addCategories(item.childrens)
-
-
-                                }}
-                                    style={{
-                                        background: 'white'
-                                    }}>
-                                    <div>
-                                        {item.name}
-                                    </div>
-                                </List.Item>
-                            )}
-                        />
-                    </Sider>
                     <Content style={{ padding: '0 24px', minHeight: 280 }}>
                         {children}
                     </Content>
@@ -98,17 +63,12 @@ const Page = ({ children, categoriesStack, parentCategoryStack, fetchCategories,
 }
 
 const mapStateToProps = state => ({
-    categoriesStack: state.data.categoriesStack,
-    parentCategoryStack: state.data.parentCategoryStack
+    currentPath: state.router.location.pathname,
+    user: state.auth.user
 });
 
 const mapDispatchToProps = {
-    fetchCategories,
-    addCategories,
-    removeCategories,
-    fetchProducts,
-    addParentCategory,
-    removeParentCategory
+    logout
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Page);
