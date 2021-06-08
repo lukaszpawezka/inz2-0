@@ -1,7 +1,5 @@
 import React from 'react'
 import Page from '../components/Page'
-import { withAuth } from '../components/Auth';
-
 
 const About = () => {
     return (
@@ -11,4 +9,4 @@ const About = () => {
     )
 }
 
-export default withAuth(About);
+export default About;

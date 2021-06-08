@@ -4,6 +4,7 @@ import { Route, Switch } from "react-router-dom";
 import About from './pages/About';
 import Home from './pages/Home';
 import Rental from './pages/Rental';
+import Cart from './pages/Cart';
 import { history } from './store';
 
 const App = () => {
@@ -18,6 +19,9 @@ const App = () => {
         </Route>
         <Route key='home' exact path="/">
           <Home />
+        </Route>
+        <Route key='cart' exact path="/cart">
+          <Cart />
         </Route>
       </Switch>
     </ConnectedRouter>

@@ -1,18 +1,22 @@
 package sportapp.prod.DTO;
 
+import java.math.BigDecimal;
+
 public class ProductCreateDTO {
 
     private long id;
     private String name;
     private String description;
     private String imgPath;
+    private BigDecimal price;
     private long categoryId;
 
-    public ProductCreateDTO(long id, String name, String description, String imgPath, long categoryId) {
+    public ProductCreateDTO(long id, String name, String description, String imgPath, BigDecimal price, long categoryId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.imgPath = imgPath;
+        this.price = price;
         this.categoryId = categoryId;
     }
 
@@ -46,6 +50,14 @@ public class ProductCreateDTO {
 
     public void setImgPath(String imgPath) {
         this.imgPath = imgPath;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public long getCategoryId() {
