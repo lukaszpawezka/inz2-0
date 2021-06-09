@@ -5,7 +5,7 @@ import sportapp.prod.model.Product;
 import sportapp.usr.model.User;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -23,6 +23,6 @@ public class Order {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private Date dateFrom;
-    private Date dateTo;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
 }

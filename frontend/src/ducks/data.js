@@ -9,6 +9,9 @@ const REMOVE_CATEGORIES = 'REMOVE_CATEGORIES';
 const SET_PRODUCTS = 'SET_PRODUCTS';
 const ADD_PARENT_CATEGORY = 'ADD_PARENT_CATEGORY';
 const REMOVE_PARENT_CATEGORY = 'REMOVE_PARENT_CATEGORY';
+const SET_ORDERS = 'SET_ORDERS'
+const ADD_ORDER = 'ADD_ORDER'
+const CLEAR_CART = 'CLEAR_CART' // TODO
 
 // Reducer
 
@@ -17,6 +20,8 @@ const initialState = {
     categoriesStack: [],
     parentCategoryStack: [],
     products: [],
+    orders: [],
+    myOrders: []
 }
 
 const reducer = (state = initialState, action = {}) => {
@@ -51,6 +56,16 @@ const reducer = (state = initialState, action = {}) => {
                 ...state,
                 parentCategoryStack: state.parentCategoryStack.slice(0, -1)
             }
+        case SET_ORDERS:
+            return {
+                ...state,
+                orders: action.orders
+            }
+        case ADD_ORDER:
+            return {
+                ...state,
+                myOrders: [...state.myOrders, action.order]
+            }
         default:
             return state;
     }
@@ -65,6 +80,8 @@ const actioRemoveCategories = () => ({ type: REMOVE_CATEGORIES });
 const actionSetProducts = products => ({ type: SET_PRODUCTS, products });
 const actionAddParentCategory = category => ({ type: ADD_PARENT_CATEGORY, category });
 const actioRemoveParentCategory = () => ({ type: REMOVE_PARENT_CATEGORY });
+const actionSetOrders = orders => ({ type: SET_ORDERS, orders });
+const actionAddOrder = order => ({ type: ADD_ORDER, order });
 
 
 // Methods
@@ -108,4 +125,35 @@ export const fetchProducts = (categoryId) =>
                 return products;
             })
             .catch(error => processError(error)(dispatch));
+    }
+
+export const fetchOrders = (productId, my = false) =>
+    dispatch => {
+        return fetch(`${config.API_URL}/orders` + (my ? '/my' : (productId ? `/product/${productId}` : '')))
+            .then(response => processResponse(response)(dispatch))
+            .then(orders => {
+                if (orders) {
+                    dispatch(actionSetOrders(orders));
+                }
+                return orders;
+            })
+            .catch(error => processError(error)(dispatch));
+    }
+
+export const addOrder = order =>
+    dispatch => dispatch(actionAddOrder(order));
+
+export const createOrders = (myOrders) =>
+    dispatch => {
+        myOrders.forEach(myOrder => {
+            fetch(`${config.API_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(myOrder)
+            })
+                .then(response => processResponse(response)(dispatch))
+                .catch(error => processError(error)(dispatch));
+        });
     }

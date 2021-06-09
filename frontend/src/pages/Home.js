@@ -2,22 +2,21 @@ import React from 'react'
 import Page from '../components/Page'
 import { Button } from 'antd';
 import { Link } from "react-router-dom";
+import homeBg from '../images/hero-bg-min.jpg';
 
 
 const Home = () => {
     return (
-        <Page>
-            <div
-                style={{
-                    backgroundImage: 'url(https://www.rankonesport.com/content/Images/hero-bg.jpg)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                    backgroundSize: 'contain, cover',
-                    //alignSelf: 'flex-start',
-                    textAlign: 'center',
-                    height: 650
-                }}
-            >
+        <Page contentStyle={{
+            backgroundImage: `url(${homeBg})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            textAlign: 'center',
+            height: '100vh',
+            maxWidth: '100%'
+        }}>
+            <div>
                 <h1 style={{
                     margin: 'auto',
                     padding: '50px 0',

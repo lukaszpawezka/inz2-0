@@ -9,7 +9,7 @@ import { logout } from '../ducks/auth';
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu
 
-const Page = ({ children, currentPath, user, logout }) => {
+const Page = ({ children, currentPath, user, logout, contentStyle, data }) => {
     const getSelectedKey = () => {
         let selectedKey = currentPath.substring(1);
         selectedKey = selectedKey === '' ? 'home' : selectedKey;
@@ -18,17 +18,21 @@ const Page = ({ children, currentPath, user, logout }) => {
     const [selectedKey, setSelectedKey] = useState(getSelectedKey());
     return (
         <Layout style={{
-            minHeight: 950
+            minHeight: 950,
+
         }}>
-            <Header>
-                <Menu
+            <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
+                <Menu style={{
+                    maxWidth: 1500,
+                    margin: '0 auto'
+                }}
                     theme="dark" mode="horizontal" defaultSelectedKeys={[selectedKey]}
                     onClick={e => setSelectedKey(e.key)} selectedKeys={[selectedKey]}>
                     <Menu.Item key="home"><Link to="/">SportApp</Link></Menu.Item>
                     <Menu.Item key="rental"><Link to="/rental">Wypożyczalnia</Link></Menu.Item>
                     <Menu.Item key="about"><Link to="/about">O nas</Link></Menu.Item>
 
-                    <Menu.Item key="cart"><Link to="/cart">Koszyk zamówień</Link></Menu.Item>
+                    <Menu.Item key="cart"><Link to="/cart">{`Koszyk zamówień ${data.myOrders.length > 0 ? '(' + data.myOrders.length + ')' : ''}`} </Link></Menu.Item>
                     <SubMenu key="sub1" title="Panel administracyjny">
                         <SubMenu key="categoryCRUD" title="Kategorie">
                             <Menu.Item key="addCategory">Dodaj nową</Menu.Item>
@@ -63,12 +67,14 @@ const Page = ({ children, currentPath, user, logout }) => {
                     </Menu.Item>
                 </Menu>
             </Header>
-            <Content>
-                <Layout style={{ padding: '24px 0' }}>
-                    <Content style={{ padding: '0 24px', minHeight: 280 }}>
-                        {children}
-                    </Content>
-                </Layout>
+            <Content style={{
+                margin: '64px auto 0',
+                padding: '0 24px',
+                width: '100%',
+                maxWidth: 1600,
+                ...contentStyle
+            }}>
+                {children}
             </Content>
             <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
         </Layout>
@@ -77,7 +83,8 @@ const Page = ({ children, currentPath, user, logout }) => {
 
 const mapStateToProps = state => ({
     currentPath: state.router.location.pathname,
-    user: state.auth.user
+    user: state.auth.user,
+    data: state.data
 });
 
 const mapDispatchToProps = {
