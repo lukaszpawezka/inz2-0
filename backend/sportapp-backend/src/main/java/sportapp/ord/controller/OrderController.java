@@ -63,7 +63,6 @@ public class OrderController {
         if(orderDTO.getUserId() > 0) {
             order.setUser(userRepository.getOne(orderDTO.getUserId()));
         }
-        System.out.println(order.getProduct().getName());
         return orderRepository.save(order);
     }
 

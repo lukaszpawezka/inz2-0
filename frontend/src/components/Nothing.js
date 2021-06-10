@@ -8,7 +8,8 @@ const Nothing = ({ description }) => {
 				style={{
 					position: 'absolute',
 					top: '50%',
-					transform: 'translateY(-50%)'
+					transform: 'translateY(-50%)',
+					fontSize: 25
 				}}
 				image={Empty.PRESENTED_IMAGE_SIMPLE}
 				description={description}

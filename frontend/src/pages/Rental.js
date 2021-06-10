@@ -1,8 +1,9 @@
-import { Button, Col, ConfigProvider, List, Row } from 'antd';
+import { Button, Col, ConfigProvider, List, Row, message } from 'antd';
 import { eachDayOfInterval } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import React, { useEffect, useState } from 'react';
-import { DateRangePicker } from 'react-date-range';
+import { Link } from "react-router-dom";
+import { DateRange  } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { GrFormPrevious } from 'react-icons/gr';
@@ -53,53 +54,125 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
     const isInArray = (array, value) =>
         !!array.find(item => item.getTime() === value.getTime());
 
+    const daysBetween = (date1, date2) =>
+        Math.round(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
+
+    const roundAccurately = (number, decimalPlaces) =>
+        Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces)
+
+    const fullPrice = product ? roundAccurately(product.price * (daysBetween(canlendarState[0].startDate, canlendarState[0].endDate) + 1), 2) : null
+
+    const success = () => {
+        message.success({
+            content: 'Produkt został dodany do koszyka',
+            className: 'custom-class',
+            style: {
+                marginTop: '80vh',
+            },
+        });
+    };
+
+
+    const loginInfo = () => {
+        message.info({
+            content: 'Aby dodać produkt do koszyka należy się zalogować',
+            className: 'custom-class',
+            style: {
+                marginTop: '80vh',
+            },
+        });
+    };
     return (
         <Page>
             <div
                 style={{
                     padding: '0 50px',
+                    marginBottom: 40,
                     width: '100%',
                 }}>
 
                 {showCalendar ?
-                    <div style={{
-                        textAlign: 'center',
-                        marginTop: 16
-                    }}>
-                        <DateRangePicker
-                            style={{
-                                textAlign: 'center'
+                    <div>
+                        <div style={{
+                            textAlign: 'center',
+                            marginTop: 50,
+
+                        }}>
+                            <h1>Wskaż datę rezerwacji dla produktu: </h1>
+                            <h1><b>{product.name}</b></h1>
+                            <h1>Cena wynajmu: <b>{product.price}</b> zł/dzień</h1>
+                        </div>
+                        <div style={{
+                            textAlign: 'center',
+                            marginTop: 50
+                        }}>
+                            <DateRange 
+                                style={{
+                                    textAlign: 'center',
+                                    width: 700
+                                }}
+                                onChange={item => setCanlendarState([item.selection])}
+                                showSelectionPreview={true}
+                                moveRangeOnFirstSelection={false}
+                                months={2}
+                                ranges={canlendarState}
+                                direction="horizontal"
+                                disabledDates={disabledDates}
+                                locale={pl}
+                            />
+
+                        </div>
+                        <div style={{
+                            textAlign: 'center',
+                            marginTop: 50
+                        }}>
+                            <h1>Suma: <b>{fullPrice}</b> zł</h1>
+                        </div>
+                        <div style={{
+                            textAlign: 'center',
+                        }}>
+                            <Button shape="round"
+                                onClick={() => {
+                                    setShowCalendar(false)
+                                }}
+                                style={{
+                                    width: 400,
+                                    height: 70,
+                                    fontSize: 30,
+                                    marginTop: 50
+                                }}>                                
+                                <Link to="/rental">Powrót</Link>
+                            </Button>
+                            <Button style={{
+                                width: 400,
+                                height: 70,
+                                fontSize: 30,
+                                marginTop: 50,
                             }}
-                            onChange={item => setCanlendarState([item.selection])}
-                            showSelectionPreview={true}
-                            moveRangeOnFirstSelection={false}
-                            months={2}
-                            ranges={canlendarState}
-                            direction="horizontal"
-                            disabledDates={disabledDates}
-                            locale={pl}
-                        />
-                        <Button
-                            type="primary"
-                            disabled={isInArray(disabledDates, canlendarState[0].startDate)}
-                            onClick={() => {
-                                const order = {
-                                    userId: user.details.id,
-                                    productId: product.id,
-                                    product: product,
-                                    dateFrom: canlendarState[0].startDate.toISOString().substring(0, 10),
-                                    dateTo: canlendarState[0].endDate.toISOString().substring(0, 10)
-                                }
-                                //console.log(order)
-                                addOrder(order)
-                                setShowCalendar(false)
-                            }}>
-                            Dodaj do koszyka
-                        </Button>
+                                type="primary" shape="round"
+                                disabled={isInArray(disabledDates, canlendarState[0].startDate)}
+                                onClick={() => {
+                                    const order = {
+                                        userId: user.details.id,
+                                        productId: product.id,
+                                        product: product,
+                                        daysBetween: daysBetween(canlendarState[0].startDate, canlendarState[0].endDate),
+                                        price: fullPrice,
+                                        dateFrom: canlendarState[0].startDate.toISOString().substring(0, 10),
+                                        dateTo: canlendarState[0].endDate.toISOString().substring(0, 10),
+                                        orderDate: new Date().toISOString().substring(0, 10)
+                                    }
+                                    addOrder(order)
+                                    setShowCalendar(false)
+                                    success()
+                                }}>
+                                Dodaj do koszyka
+                            </Button>
+                        </div>
                     </div>
                     :
                     <Row gutter={[16, 16]}>
-                        <Col xs={8}>
+                        <Col xs={5}>
                             <ConfigProvider renderEmpty={() => null}>
                                 <List
                                     header={categoriesStack.length > 1 ?
@@ -146,12 +219,18 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                                     )}
                                     style={{
                                         backgroundColor: 'white',
-                                        marginTop: 12
+                                        marginTop: 12,
+                                        minHeight: '50vh'
                                     }} />
                             </ConfigProvider>
                         </Col>
                         <Col xs={16}>
-                            <ConfigProvider renderEmpty={() => <Nothing description={'Brak produktów'} />}>
+                            <ConfigProvider renderEmpty={() =>
+                                <div style={{
+                                    marginTop: 100
+                                }}>
+                                    <Nothing description={'Brak produktów'} />
+                                </div>}>
                                 <List
                                     dataSource={products}
                                     pagination={{
@@ -183,7 +262,7 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
 
                                                         <div style={{
                                                             position: 'absolute',
-                                                            bottom: 0,
+                                                            top: 55,
                                                             right: 0
                                                         }}>
                                                             <div style={{
@@ -200,10 +279,13 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                                                                     shape='circle'
                                                                     icon={<MdShoppingBasket style={{ verticalAlign: '-0.125em', fontSize: 24 }} />}
                                                                     onClick={() => {
+                                                                        user.details ? 
                                                                         fetchOrders(item.id).then(() => {
                                                                             setProduct(item)
                                                                             setShowCalendar(true)
                                                                         })
+                                                                        : 
+                                                                        loginInfo()
                                                                     }}
                                                                 />
                                                             </div>

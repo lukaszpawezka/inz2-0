@@ -3,17 +3,27 @@ import React, { useState } from 'react';
 import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
 import { connect } from 'react-redux';
 import { login } from '../ducks/auth';
+import { withRouter } from 'react-router';
 
-const Login = ({ login }) => {
+const Login = ({ login, history }) => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [validateStatus, setValidateStatus] = useState('');
 
+
 	return (
 		<div style={{ display: 'flex', justifyContent: 'center', background: '#EEEEEE', width: '100%', height: '100%', position: 'absolute' }}>
-			<Card title={<div style={{ width: '100%', textAlign: 'center' }}><img style={{ height: 60, marginRight: 20 }} alt='Logo' /></div>} bordered={true}
-				style={{ width: 300, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }}>
+			<Card title={<div style={{ width: '100%', textAlign: 'center' }}>
+				<h1 style={{
+					margin: 'auto',
+                    color: 'white',
+                    fontSize: '80px',
+                    fontFamily: 'Impact',
+                    textShadow: '0 0 20px #454545'
+				}}> SportApp </h1></div>
+			} bordered={true}
+				style={{ width: 500, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }}>
 				<Form name='login-form'>
 					<Form.Item
 						name='username'
@@ -30,11 +40,13 @@ const Login = ({ login }) => {
 					<Form.Item>
 						<Button style={{ width: '100%' }} htmlType='submit' type='primary' loading={loading}
 							onClick={() => {
+								console.log(history)
 								setLoading(true);
 								login(username, password)
 									.then(response => {
 										setLoading(true);
 										setValidateStatus(response.ok ? '' : 'error');
+										history.push('/rental');
 									});
 							}}>
 							Zaloguj
@@ -53,4 +65,4 @@ const mapDispatchToProps = {
 	login
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Login));

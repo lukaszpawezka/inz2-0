@@ -11,7 +11,8 @@ const ADD_PARENT_CATEGORY = 'ADD_PARENT_CATEGORY';
 const REMOVE_PARENT_CATEGORY = 'REMOVE_PARENT_CATEGORY';
 const SET_ORDERS = 'SET_ORDERS'
 const ADD_ORDER = 'ADD_ORDER'
-const CLEAR_CART = 'CLEAR_CART' // TODO
+const CLEAR_CART = 'CLEAR_CART'
+const REMOVE_CART_ITEM = 'REMOVE_CART_ITEM';
 
 // Reducer
 
@@ -66,6 +67,23 @@ const reducer = (state = initialState, action = {}) => {
                 ...state,
                 myOrders: [...state.myOrders, action.order]
             }
+        case CLEAR_CART:
+            return {
+                ...state,
+                myOrders: []
+            }
+        case REMOVE_CART_ITEM:
+            let myOrd = state.myOrders;
+            let myOrderIndex = myOrd.findIndex(item => item.id === action.order.id);
+            if (myOrderIndex >= 0) {
+                myOrd.splice(myOrderIndex, 1);
+            }
+
+            setItem('myOrders', myOrd);
+            return {
+                ...state,
+                myOrders: myOrd
+            }
         default:
             return state;
     }
@@ -82,6 +100,9 @@ const actionAddParentCategory = category => ({ type: ADD_PARENT_CATEGORY, catego
 const actioRemoveParentCategory = () => ({ type: REMOVE_PARENT_CATEGORY });
 const actionSetOrders = orders => ({ type: SET_ORDERS, orders });
 const actionAddOrder = order => ({ type: ADD_ORDER, order });
+const actioClearCart = () => ({ type: CLEAR_CART });
+const actionRemoveCartItem = order => ({ type: REMOVE_CART_ITEM, order });
+
 
 
 // Methods
@@ -129,7 +150,9 @@ export const fetchProducts = (categoryId) =>
 
 export const fetchOrders = (productId, my = false) =>
     dispatch => {
-        return fetch(`${config.API_URL}/orders` + (my ? '/my' : (productId ? `/product/${productId}` : '')))
+        return fetch(`${config.API_URL}/orders` + (my ? '/my' : (productId ? `/product/${productId}` : '')) , {
+            credentials: 'include'
+        })
             .then(response => processResponse(response)(dispatch))
             .then(orders => {
                 if (orders) {
@@ -157,3 +180,12 @@ export const createOrders = (myOrders) =>
                 .catch(error => processError(error)(dispatch));
         });
     }
+export const clearCart = () =>
+    dispatch => dispatch(actioClearCart());
+
+export const removeCartItem = order =>
+    dispatch => dispatch(actionRemoveCartItem(order));
+
+const setItem = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+}

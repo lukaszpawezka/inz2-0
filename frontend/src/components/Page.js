@@ -33,38 +33,60 @@ const Page = ({ children, currentPath, user, logout, contentStyle, data }) => {
                     <Menu.Item key="about"><Link to="/about">O nas</Link></Menu.Item>
 
                     <Menu.Item key="cart"><Link to="/cart">{`Koszyk zamówień ${data.myOrders.length > 0 ? '(' + data.myOrders.length + ')' : ''}`} </Link></Menu.Item>
-                    <SubMenu key="sub1" title="Panel administracyjny">
-                        <SubMenu key="categoryCRUD" title="Kategorie">
-                            <Menu.Item key="addCategory">Dodaj nową</Menu.Item>
-                            <Menu.Item key="editCategory">Edytuj</Menu.Item>
-                            <Menu.Item key="deleteCategory">Usuń</Menu.Item>
-                        </SubMenu>
-                        <SubMenu key="productCRUD" title="Produkty">
-                            <Menu.Item key="addProduct">Dodaj nowy</Menu.Item>
-                            <Menu.Item key="updateProduct">Edytuj</Menu.Item>
-                            <Menu.Item key="deleteProduct">Usuń</Menu.Item>
-                        </SubMenu>
-                    </SubMenu>
+                    {user.details ?
+                        user.details.admin ?
+                            <SubMenu key="sub1" title="Panel administracyjny">
+                                <SubMenu key="orders" title="Zamówienia">
+                                    <Menu.Item key="showOrder">
+                                        <Link to="/orders">Pokaż zamówienia</Link>
+                                    </Menu.Item>
+                                </SubMenu>
+                                <SubMenu key="categoryCRUD" title="Kategorie">
+                                    <Menu.Item key="addCategory">Dodaj nową</Menu.Item>
+                                    <Menu.Item key="editCategory">Edytuj</Menu.Item>
+                                    <Menu.Item key="deleteCategory">Usuń</Menu.Item>
+                                </SubMenu>
+                                <SubMenu key="productCRUD" title="Produkty">
+                                    <Menu.Item key="addProduct">Dodaj nowy</Menu.Item>
+                                    <Menu.Item key="updateProduct">Edytuj</Menu.Item>
+                                    <Menu.Item key="deleteProduct">Usuń</Menu.Item>
+                                </SubMenu>
+                            </SubMenu>
+                            : null
+                        : null}
 
-                    <Menu.Item key='settings' style={{ float: 'right', backgroundColor: 'transparent' }}>
-                        <Dropdown overlay={
-                            <Menu>
-                                <Menu.Item>
-                                    <Link style={{}} to='' onClick={logout}><AiOutlineLogout style={{ verticalAlign: '-0.125em' }} /> Wyloguj</Link>
-                                </Menu.Item>
-                            </Menu>
-                        }>
-                            {user.authenticated ?
-                                <Button style={{
-                                    background: 'none',
-                                    border: 'none'
-                                }}>
-                                    <Avatar name={user.details.fullName} size='40' round={true} />
-                                </Button>
-                                : <></>
-                            }
-                        </Dropdown>
-                    </Menu.Item>
+                    {user.details ?
+                        <Menu.Item key='settings' style={{ float: 'right', backgroundColor: 'transparent' }}>
+                            <Dropdown overlay={
+                                <Menu>
+                                    <Menu.ItemGroup key="myProfile" title="Mój profil">
+                                        <Menu.Item key="myOrders"><Link to="/myOrders">Moje zamówienia</Link></Menu.Item>
+                                        <Menu.Item key="editProfile">Edytuj profil</Menu.Item>
+                                    </Menu.ItemGroup>
+                                    <Menu.Item />
+                                    <Menu.Item key="logout">
+                                        <Link style={{}} to='' onClick={logout}><AiOutlineLogout style={{ verticalAlign: '-0.125em' }} /> Wyloguj</Link>
+                                    </Menu.Item>
+                                </Menu>
+                            }>
+                                {user.authenticated ?
+                                    <Button style={{
+                                        background: 'none',
+                                        border: 'none'
+                                    }}>
+                                        <Avatar name={user.details.fullName} size='40' round={true} />
+                                    </Button>
+                                    : <></>
+                                }
+                            </Dropdown>
+                        </Menu.Item>
+                        :
+                        <Menu.Item key="login"
+                            style={{
+                                float: 'right'
+                            }}><Link to="/login">Zaloguj</Link></Menu.Item>
+                    }
+
                 </Menu>
             </Header>
             <Content style={{
@@ -76,7 +98,11 @@ const Page = ({ children, currentPath, user, logout, contentStyle, data }) => {
             }}>
                 {children}
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+            <Footer style={{
+                textAlign: 'center',
+                background: '#001529',
+                color: 'white',
+            }}>©2021 Created by Łukasz Pawęzka 242436</Footer>
         </Layout>
     )
 }

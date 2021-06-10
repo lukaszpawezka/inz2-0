@@ -5,7 +5,10 @@ import About from './pages/About';
 import Home from './pages/Home';
 import Rental from './pages/Rental';
 import Cart from './pages/Cart';
+import Login from './components/Login';
+import Orders from './components/Orders';
 import { history } from './store';
+import MyHistoryOrders from './pages/MyHistoryOrders';
 
 const App = () => {
   return (
@@ -22,6 +25,15 @@ const App = () => {
         </Route>
         <Route key='cart' exact path="/cart">
           <Cart />
+        </Route>
+        <Route key='login' exact path="/login">
+          <Login />
+        </Route>
+        <Route key='myHistoryOrders' exact path="/myOrders">
+          <MyHistoryOrders />
+        </Route>
+        <Route key='Orders' exact path="/orders">
+          <Orders />
         </Route>
       </Switch>
     </ConnectedRouter>
