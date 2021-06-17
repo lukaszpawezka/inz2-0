@@ -1,4 +1,4 @@
-import { Button, Col, ConfigProvider, List, Row } from 'antd';
+import { Button, Col, ConfigProvider, List, Row, DatePicker } from 'antd';
 import React, { useEffect } from 'react';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -11,6 +11,8 @@ import { fetchOrders } from '../ducks/data';
 
 
 const MyHistoryOrders = ({ orders, fetchOrders }) => {
+
+    const { RangePicker } = DatePicker;
 
     useEffect(() => {
         fetchOrders(null, true)
@@ -25,9 +27,18 @@ const MyHistoryOrders = ({ orders, fetchOrders }) => {
                 }}>
                     <Nothing description={'Brak produktów'} />
                 </div>}>
+                <div style={{
+                    marginTop: 30,
+                    textAlign: 'center'
+                }}>
+                    <h2>Okres czasowy wyszukiwania zamówień: </h2>
+                    <RangePicker style={{
+                        width: '80%'
+                    }}/>
+                </div>
                 <List
                     style={{
-                        marginTop: 30
+                        marginTop: 40
                     }}
                     dataSource={orders}
                     renderItem={item => (

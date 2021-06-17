@@ -51,6 +51,19 @@ const Login = ({ login, history }) => {
 							}}>
 							Zaloguj
 						</Button>
+						<Button style={{ width: '100%', marginTop: 20, background: 'blue' }} htmlType='submit' type='primary' loading={loading}
+							onClick={() => {
+								console.log(history)
+								setLoading(true);
+								login(username, password)
+									.then(response => {
+										setLoading(true);
+										setValidateStatus(response.ok ? '' : 'error');
+										history.push('/rental');
+									});
+							}}>
+							Nie posiadasz konta? Zarejestruj się.
+						</Button>
 					</Form.Item>
 				</Form>
 			</Card>

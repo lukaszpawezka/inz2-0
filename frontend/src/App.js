@@ -1,14 +1,17 @@
 import { ConnectedRouter } from 'connected-react-router';
 import React from 'react';
 import { Route, Switch } from "react-router-dom";
-import About from './pages/About';
-import Home from './pages/Home';
-import Rental from './pages/Rental';
-import Cart from './pages/Cart';
 import Login from './components/Login';
 import Orders from './components/Orders';
-import { history } from './store';
+import About from './pages/About';
+import Cart from './pages/Cart';
+import Category from './pages/Category';
+import Home from './pages/Home';
 import MyHistoryOrders from './pages/MyHistoryOrders';
+import Product from './pages/Product';
+import Rental from './pages/Rental';
+import User from './pages/User';
+import { history } from './store';
 
 const App = () => {
   return (
@@ -34,6 +37,15 @@ const App = () => {
         </Route>
         <Route key='Orders' exact path="/orders">
           <Orders />
+        </Route>
+        <Route key='User' exact path="/account">
+          <User />
+        </Route>
+        <Route key='Product' exact path="/product">
+          <Product />
+        </Route>
+        <Route key='Category' exact path="/cat">
+          <Category />
         </Route>
       </Switch>
     </ConnectedRouter>

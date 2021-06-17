@@ -42,14 +42,14 @@ const Page = ({ children, currentPath, user, logout, contentStyle, data }) => {
                                     </Menu.Item>
                                 </SubMenu>
                                 <SubMenu key="categoryCRUD" title="Kategorie">
-                                    <Menu.Item key="addCategory">Dodaj nową</Menu.Item>
-                                    <Menu.Item key="editCategory">Edytuj</Menu.Item>
-                                    <Menu.Item key="deleteCategory">Usuń</Menu.Item>
+                                    <Menu.Item key="addCategory"><Link to="/cat">Dodaj nową</Link></Menu.Item>
+                                    <Menu.Item key="editCategory"><Link to="/cat">Edytuj</Link></Menu.Item>
+                                    <Menu.Item key="deleteCategory"><Link to="/cat">Usuń</Link></Menu.Item>
                                 </SubMenu>
                                 <SubMenu key="productCRUD" title="Produkty">
-                                    <Menu.Item key="addProduct">Dodaj nowy</Menu.Item>
-                                    <Menu.Item key="updateProduct">Edytuj</Menu.Item>
-                                    <Menu.Item key="deleteProduct">Usuń</Menu.Item>
+                                    <Menu.Item key="addProduct"><Link to="/product">Dodaj nowy</Link></Menu.Item>
+                                    <Menu.Item key="updateProduct"><Link to="/product">Edytuj</Link></Menu.Item>
+                                    <Menu.Item key="deleteProduct"><Link to="/product">Usuń</Link></Menu.Item>
                                 </SubMenu>
                             </SubMenu>
                             : null
@@ -61,7 +61,7 @@ const Page = ({ children, currentPath, user, logout, contentStyle, data }) => {
                                 <Menu>
                                     <Menu.ItemGroup key="myProfile" title="Mój profil">
                                         <Menu.Item key="myOrders"><Link to="/myOrders">Moje zamówienia</Link></Menu.Item>
-                                        <Menu.Item key="editProfile">Edytuj profil</Menu.Item>
+                                        <Menu.Item key="editProfile"><Link to="/account">Edytuj profil</Link></Menu.Item>
                                     </Menu.ItemGroup>
                                     <Menu.Item />
                                     <Menu.Item key="logout">

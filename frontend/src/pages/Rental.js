@@ -1,24 +1,29 @@
-import { Button, Col, ConfigProvider, List, Row, message } from 'antd';
+import { DislikeFilled, DislikeOutlined, LikeFilled, LikeOutlined } from '@ant-design/icons';
+import { Button, Col, Comment, ConfigProvider, Input, List, message, Modal, Row, Tooltip } from 'antd';
 import { eachDayOfInterval } from 'date-fns';
 import { pl } from 'date-fns/locale';
-import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
-import { DateRange  } from 'react-date-range';
+import React, { createElement, useEffect, useState } from 'react';
+import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
+import { FaComment } from 'react-icons/fa';
 import { GrFormPrevious } from 'react-icons/gr';
 import { MdShoppingBasket } from 'react-icons/md';
 import { connect, useDispatch } from 'react-redux';
+import { Link } from "react-router-dom";
 import Nothing from '../components/Nothing';
 import Page from '../components/Page';
-import { addCategories, addOrder, addParentCategory, fetchCategories, fetchOrders, fetchProducts, removeCategories, removeParentCategory } from '../ducks/data';
+import { addCategories, addComment, addOrder, addParentCategory, fetchCategories, fetchComments, fetchOrders, fetchProducts, removeCategories, removeParentCategory } from '../ducks/data';
 import { formatAsCurrency } from '../utils/utils';
 
-const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategories, addCategories, removeCategories, fetchProducts, orders, fetchOrders, addOrder, user }) => {
+const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategories, addCategories, removeCategories, fetchProducts, orders, fetchOrders, addOrder, user, comments, fetchComments, addComment }) => {
     const [showProducts, setShowProduct] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [product, setProduct] = useState(null);
+    const [commentVisible, setCommentsVisible] = useState(false);
     const dispatch = useDispatch();
+
+    const { TextArea } = Input;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -75,13 +80,63 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
 
     const loginInfo = () => {
         message.info({
-            content: 'Aby dodać produkt do koszyka należy się zalogować',
+            content: 'Musisz się zalogować',
             className: 'custom-class',
             style: {
                 marginTop: '80vh',
             },
         });
     };
+
+
+    const [likes, setLikes] = useState(0);
+    const [dislikes, setDislikes] = useState(0);
+    const [action, setAction] = useState(null);
+    const [commentValue, setCommentValue] = useState('');
+
+    const onCommentSubmit = (item) => {
+
+        if (!commentValue) {
+            return
+        }
+        const comment = {
+            userId: user.details.id,
+            message: commentValue,
+            productId: item.id,
+            commentDate: new Date().toISOString().substring(0, 10)
+        }
+        console.log('dupa', comment)
+        addComment(comment)
+        setCommentValue('')
+    };
+
+    const like = () => {
+        setLikes(1);
+        setDislikes(0);
+        setAction('liked');
+    };
+
+    const dislike = () => {
+        setLikes(0);
+        setDislikes(1);
+        setAction('disliked');
+    };
+
+    const actions = [
+        <Tooltip key="comment-basic-like" title="Like">
+            <span onClick={like}>
+                {createElement(action === 'liked' ? LikeFilled : LikeOutlined)}
+                <span className="comment-action">{likes}</span>
+            </span>
+        </Tooltip>,
+        <Tooltip key="comment-basic-dislike" title="Dislike">
+            <span onClick={dislike}>
+                {React.createElement(action === 'disliked' ? DislikeFilled : DislikeOutlined)}
+                <span className="comment-action">{dislikes}</span>
+            </span>
+        </Tooltip>,
+        <span key="comment-basic-reply-to">Reply to</span>,
+    ];
     return (
         <Page>
             <div
@@ -106,7 +161,7 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                             textAlign: 'center',
                             marginTop: 50
                         }}>
-                            <DateRange 
+                            <DateRange
                                 style={{
                                     textAlign: 'center',
                                     width: 700
@@ -140,7 +195,7 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                                     height: 70,
                                     fontSize: 30,
                                     marginTop: 50
-                                }}>                                
+                                }}>
                                 <Link to="/rental">Powrót</Link>
                             </Button>
                             <Button style={{
@@ -220,7 +275,7 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                                     style={{
                                         backgroundColor: 'white',
                                         marginTop: 12,
-                                        minHeight: '50vh'
+                                        minHeight: '17vh'
                                     }} />
                             </ConfigProvider>
                         </Col>
@@ -262,8 +317,8 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
 
                                                         <div style={{
                                                             position: 'absolute',
-                                                            top: 55,
-                                                            right: 0
+                                                            top: 45,
+                                                            right: -100
                                                         }}>
                                                             <div style={{
                                                                 textAlign: 'right',
@@ -279,17 +334,90 @@ const Rental = ({ products, categoriesStack, parentCategoryStack, fetchCategorie
                                                                     shape='circle'
                                                                     icon={<MdShoppingBasket style={{ verticalAlign: '-0.125em', fontSize: 24 }} />}
                                                                     onClick={() => {
-                                                                        user.details ? 
-                                                                        fetchOrders(item.id).then(() => {
-                                                                            setProduct(item)
-                                                                            setShowCalendar(true)
-                                                                        })
-                                                                        : 
-                                                                        loginInfo()
+                                                                        user.details ?
+                                                                            fetchOrders(item.id).then(() => {
+                                                                                setProduct(item)
+                                                                                setShowCalendar(true)
+                                                                            })
+                                                                            :
+                                                                            loginInfo()
                                                                     }}
                                                                 />
                                                             </div>
+                                                            <div style={{
+                                                                textAlign: 'right',
+                                                                marginTop: 5,
+                                                                fontSize: 12
+                                                            }}>
+                                                                <Button style={{
+                                                                    backgroundImage: 'linear-gradient(225deg, #b0e2ff, #2bb0fc)',
+                                                                    border: 0,
+                                                                    color: 'white',
+                                                                    width: 45,
+                                                                    height: 45
+                                                                }}
+                                                                    shape='circle'
+                                                                    icon={<FaComment style={{ verticalAlign: '-0.125em', fontSize: 24 }} />}
+                                                                    onClick={() => {
+                                                                        if (user.details) {
+                                                                            fetchComments(item.id)
+                                                                            setCommentsVisible(true)
+                                                                        } else
+                                                                            loginInfo()
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <Modal
+                                                                centered
+                                                                visible={commentVisible}
+                                                                onOk={() => setCommentsVisible(false)}
+                                                                onCancel={() => setCommentsVisible(false)}
+                                                                width={1000}
+                                                            >
 
+
+                                                                <ConfigProvider renderEmpty={() => <Nothing description={'Brak komentarzy'} />}>
+                                                                    <List
+                                                                        dataSource={comments}
+                                                                        pagination={{
+                                                                            showSizeChanger: true,
+                                                                            pageSizeOptions: ["5", "10", "15", "20"],
+                                                                            position: "bottom"
+                                                                        }}
+                                                                        renderItem={commentItem => (
+                                                                            <List.Item>
+                                                                                <Comment
+                                                                                    actions={actions}
+                                                                                    author={commentItem.user.fullName}
+                                                                                    content={
+                                                                                        <p>
+                                                                                            {commentItem.message}
+                                                                                        </p>
+                                                                                    }
+                                                                                    datetime={
+                                                                                        <Tooltip title={commentItem.commentDate}>
+                                                                                            <span>{commentItem.commentDate}</span>
+                                                                                        </Tooltip>
+                                                                                    }
+                                                                                />
+                                                                            </List.Item>
+                                                                        )}
+                                                                    />
+                                                                    <div style={{
+                                                                        marginTop: 20
+                                                                    }}>
+                                                                        <TextArea rows={4} onChange={e => setCommentValue(e.target.value)} value={commentValue} />
+
+                                                                        <Button type="primary" onClick={() => {
+                                                                            onCommentSubmit(item).then(() => {
+                                                                            })
+                                                                            fetchComments(item.id)
+                                                                        }}>
+                                                                            Dodaj komentarz
+                                                                    </Button>
+                                                                    </div>
+                                                                </ConfigProvider>
+                                                            </Modal>
                                                         </div>
                                                     </div>
                                                 </Col>
@@ -312,7 +440,8 @@ const mapStateToProps = state => ({
     categoriesStack: state.data.categoriesStack,
     parentCategoryStack: state.data.parentCategoryStack,
     orders: state.data.orders,
-    order: state.data.order
+    order: state.data.order,
+    comments: state.data.comments
 });
 
 const mapDispatchToProps = {
@@ -323,7 +452,9 @@ const mapDispatchToProps = {
     addParentCategory,
     removeParentCategory,
     fetchOrders,
-    addOrder
+    addOrder,
+    fetchComments,
+    addComment
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Rental);

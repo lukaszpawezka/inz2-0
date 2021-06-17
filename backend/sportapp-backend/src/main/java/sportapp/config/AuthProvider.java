@@ -9,8 +9,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import sportapp.usr.model.User;
-import sportapp.usr.repository.UserRepository;
+import sportapp.model.User;
+import sportapp.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
